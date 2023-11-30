@@ -1,0 +1,9 @@
+Package: masv
+Type: Package
+Title: Metadata Augmented Separated Values
+Description: A package for reading and writing metadata augmented separated values (MASV) files.
+Version: 0.0.1
+License: None
+Author: Ronan Daly <ronan@dalyr.com> [aut, cre]
+Encoding: UTF-8
+Maintainer: Ronan Daly <ronan@dalyr.com>
