@@ -1,0 +1,41 @@
+MASV File Format
+----------------
+A MASV file is a tab-seperated file that is used to store data and metadata.
+In a version 1 file, the data consists of multiple named features, all of the same type and
+a number of replicates. The metadata consists of named features associated with the
+samples, such as covariates and experimental conditions and named meta-features associated
+with the features. Each feature has a type.
+The data and metadata can have missing values which are given as an empty cell.
+The file can be thought of as a sequence of rows, each of which contains a number of cells,
+seperated by tabs
+
+Types in this file format consist of the following:
+* float: A floating point type
+* str: A string type
+* int: An integer type
+* factor: A factor type
+* date: A data, time or date-time in ISO 8601 format
+
+The first row consists of the following:
+* The first cell is the string "MASV:1", where "1" stands for the version of the standard
+* Next comes a blank cell
+* Next come the names of all the features in the data, one for each cell
+* Next come the names of all the covariates, one for each cell
+
+The second row consists of the following:
+* The first cell is blank
+* The next cell contains the type of the data
+* Next come blank cells, one for each for each data feature
+* Next come type cells, one for each covariate
+
+From then on, each row consists of:
+* The first cell is the name of a sample
+* Next comes a blank cell
+* Next come data value cells, one for each feature
+* Next come covariate value cells, one for each covariate
+
+After this, each row consists of:
+* The first cell is the name of a meta-feature
+* Next comes a type cell of that meta-feature,
+* Next come meta-feature values cells, one for each feature
+

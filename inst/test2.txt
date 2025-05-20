@@ -1,0 +1,7 @@
+MASV1:float:2S3F	Feature1	Feature2	Feature3	Sex:factor	Loc:string
+Sample1	1.00E+07	1.34E+06	2.49E+05	M	Hos1
+Sample2	2.00E+07		2.30E+05	M	
+Sample3	2.50E+07	3.00E+06		F	Hos2
+mz:float	35.67		102.36		
+rt:float	1200	1502	1502		
+polarity:factor	pos	pos	neg		
