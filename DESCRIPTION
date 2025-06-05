@@ -5,5 +5,7 @@ Description: A package for reading and writing metadata augmented separated valu
 Version: 0.0.1
 License: None
 Author: Ronan Daly <ronan@dalyr.com> [aut, cre]
+Authors@R: c(
+    person("Ronan", "Daly", email = "ronan@dalyr.com", role = "aut"),
+    person("Corey", "Ansley", email = "coreyansley@gmail.com", role = c("aut", "cre")))
 Encoding: UTF-8
-Maintainer: Ronan Daly <ronan@dalyr.com>
