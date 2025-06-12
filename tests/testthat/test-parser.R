@@ -12,8 +12,8 @@ library(testthat)
 #f = names(eset@featureData@data)[1]
 
 test_that("test parser", {
-  setwd('../..')
-  print(getwd())
-  eset = parseExpressionSet("./inst/masv1test.tsv")
+  #setwd('../..')
+  #print(getwd())
+  eset = parseExpressionSet(test_path("testdata", "masv1test.tsv"))
   expect_equal(names(eset@featureData@data)[1], "mz")
 })
