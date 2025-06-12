@@ -3,7 +3,7 @@ Type: Package
 Title: Metadata Augmented Separated Values
 Description: A package for reading and writing metadata augmented separated values (MASV) files.
 Version: 0.0.1
-License: None
+License: GNU GENERAL PUBLIC LICENSE
 Author: Ronan Daly <ronan@dalyr.com> [aut, cre]
 Authors@R: c(
     person("Ronan", "Daly", email = "ronan@dalyr.com", role = "aut"),
