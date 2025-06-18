@@ -6,7 +6,7 @@ Version: 0.0.1
 License: GPL-3
 Author: Ronan Daly <ronan@dalyr.com> [aut, cre]
 Authors@R: c(
-    person("Ronan", "Daly", email = "ronan@dalyr.com", role = c("aut", "cre")),
+    person("Ronan", "Daly", email = "ronan@dalyr.com", role = c("aut")),
     person("Corey", "Ansley", email = "coreyansley@gmail.com", role = c("aut", "cre")))
 Encoding: UTF-8
 Imports:
