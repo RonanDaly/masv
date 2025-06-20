@@ -94,6 +94,9 @@ parseData = function(cols, dataType) {
   }
 }
 
+# Parse a row of 
+#parseFeatureGroups
+
 parseMASVFile = function(filename) {
   con = file(filename, open='r')
   firstLine = readLines(con, n=1, ok=FALSE)
@@ -107,16 +110,50 @@ parseMASVFile = function(filename) {
 
   secondLine = readLines(con, n=1, ok=FALSE)
   secondCols = strsplit(secondLine, '\t', fixed=TRUE)[[1]]
-
-  # Get type of data
-  dataType = secondCols[2]
-
+  
+  thirdLine = readLines(con, n=1, ok=FALSE)
+  thirdCols = strsplit(thirdLine, '\t', fixed=TRUE)[[1]]
+    
   # Get positions of feature and covariate columns
-  featureNamesStart = 3
-  featureNamesEnd = 1 + length(secondCols) - sum(secondCols != "")
   covariateNamesStart = featureNamesEnd + 1
   covariateNamesEnd = length(secondCols)
 
+  # Get feature types
+  #dataType = secondCols[2]
+  
+  current_type = NULL
+  group_length = 0
+  feature_groups = c()
+  group_names = c()
+ 
+  featureNamesStart = 3
+  featureNamesEnd = 3
+  
+  for (i in 3:length(secondCols)){
+    print(i)
+    if ( secondCols[i] != "" ){
+      print(secondCols[i])
+      if (group_length > 0) {
+        feature_groups = append(feature_groups,c(current_type, group_length))
+        group_names = append(group_names,thirdCols[i])
+        featureNamesEnd = featureNamesEnd + group_length
+      }
+      
+    current_type = secondCols[i]
+    group_length = 0
+    
+    } else {
+        group_length = group_length + 1
+    }
+  }
+  
+  # Get positions of feature and covariate columns
+  covariateNamesStart = featureNamesEnd + 1
+  covariateNamesEnd = length(secondCols)
+  
+  close(con)
+  return(group_names)
+  
   # Get feature names
   featureNames = as.character(unlist(firstCols[featureNamesStart:featureNamesEnd]))
   covariateNames = as.character(unlist(firstCols[covariateNamesStart:covariateNamesEnd]))
@@ -200,3 +237,4 @@ parseExpressionSet = function(filename) {
   eset
 }
 
+feature_groups = parseMASVFile('./inst/masv2test.tsv')
