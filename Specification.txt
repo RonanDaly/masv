@@ -1,7 +1,7 @@
 MASV File Format
 ----------------
 A MASV file is a tab-seperated file that is used to store data and metadata.
-In a version 1 file, the data consists of multiple named features, all of the same type and
+In a version 1 file, the data consists of multiple named features, grouped by type and
 a number of replicates. The metadata consists of named features associated with the
 samples, such as covariates and experimental conditions and named meta-features associated
 with the features. Each feature has a type.
@@ -18,15 +18,17 @@ Types in this file format consist of the following:
 
 The first row consists of the following:
 * The first cell is the string "MASV:1", where "1" stands for the version of the standard
-* Next comes a blank cell
-* Next come the names of all the features in the data, one for each cell
-* Next come the names of all the covariates, one for each cell
+* For each group of features there is a blank cell, then a cell with the name of each feature
+* After all features in all groups the names of covariates are also specifiecied, one in each cell
 
 The second row consists of the following:
 * The first cell is blank
-* The next cell contains the type of the data
-* Next come blank cells, one for each for each data feature
+* For each group of features there is cell specificying the data type, followed by a blank cell for each feature
 * Next come type cells, one for each covariate
+
+The third row consists of the following:
+* The first cell is blank
+* For each group of features there is cell specifying the name of the feature group then a blank cell for each feature
 
 From then on, each row consists of:
 * The first cell is the name of a sample
