@@ -1,0 +1,11 @@
+MASV:1	TYPE:Metabolomics	Feature1	Feature2	Feature3		BFeature1	BFeature2	Sex	Loc	Disease	IntFactor
+	float				int			factor	string	factor	int
+	Metabolite				Transcript			factor	string	factor	int
+Sample1_p1		1.00E+07	1.34E+06	2.49E+05		100	100	M	Hos1	No	4
+Sample2_p1		2.00E+07		2.30E+05		100	100			Yes	
+Sample3		2.50E+07	3.00E+06			100	100	F	Hos2		5
+mz	float	35.67		102.36							
+rt	float	1200	1502	1502							
+polarity	factor	pos	pos	neg							
+type	factor	mean	sd	mean 							
+IntMetaFeature	int	7		9							
