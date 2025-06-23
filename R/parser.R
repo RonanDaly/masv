@@ -113,37 +113,35 @@ parseMASVFile = function(filename) {
   
   thirdLine = readLines(con, n=1, ok=FALSE)
   thirdCols = strsplit(thirdLine, '\t', fixed=TRUE)[[1]]
-    
-  # Get positions of feature and covariate columns
-  covariateNamesStart = featureNamesEnd + 1
-  covariateNamesEnd = length(secondCols)
 
   # Get feature types
   #dataType = secondCols[2]
   
-  current_type = NULL
-  group_length = 0
+  
   feature_groups = c()
   group_names = c()
  
   featureNamesStart = 3
   featureNamesEnd = 3
   
+  current_type = NULL
+  group_start = 0
+  group_end = 0
   for (i in 3:length(secondCols)){
     print(i)
     if ( secondCols[i] != "" ){
       print(secondCols[i])
-      if (group_length > 0) {
-        feature_groups = append(feature_groups,c(current_type, group_length))
+      if (group_end > group_start) {
+        feature_groups = append(feature_groups,c(current_type, group_start, group_end))
         group_names = append(group_names,thirdCols[i])
-        featureNamesEnd = featureNamesEnd + group_length
+        featureNamesEnd = group_end
       }
       
     current_type = secondCols[i]
-    group_length = 0
+    group_start = i+1
     
     } else {
-        group_length = group_length + 1
+        group_end = i
     }
   }
   
@@ -151,16 +149,20 @@ parseMASVFile = function(filename) {
   covariateNamesStart = featureNamesEnd + 1
   covariateNamesEnd = length(secondCols)
   
-  close(con)
-  return(group_names)
   
   # Get feature names
   featureNames = as.character(unlist(firstCols[featureNamesStart:featureNamesEnd]))
   covariateNames = as.character(unlist(firstCols[covariateNamesStart:covariateNamesEnd]))
 
   # Create empty vector to store data
-  data = vector(getRType(dataType), 0)
-
+  data = c()
+  for (group in feature_groups) {
+    data = append(data,vector(getRType(group[0]), 0))
+  }
+  
+  close(con)
+  return(data)
+  
   # Create dataframe to store covariates
   covariates = data.frame(matrix(nrow=0, ncol=length(covariateNames), dimnames=list(NULL, covariateNames)))
   sampleNames = c()
@@ -184,8 +186,17 @@ parseMASVFile = function(filename) {
       # Get sample name
       sampleName = cols[1]
       sampleNames = c(sampleNames, sampleName)
+      
       # Parse the data for this sample
+      for (i in 1:length(feature_groups)) {
+        group_start = feature_groups[1][2]
+        group_end = feature_groups[1][3]
+        parsedData = parseData(cols[feature:featureNamesEnd], dataType)
+        data = append(data,vector(getRType(group[0]), 0))
+      }
+      
       parsedData = parseData(cols[featureNamesStart:featureNamesEnd], dataType)
+      
       data = append(data, parsedData)
 
       covariateRow = cols[covariateNamesStart:covariateNamesEnd]
