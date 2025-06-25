@@ -1,0 +1,14 @@
+MASV:1	This is a subtype string	Feature1	Feature2	Feature3		Feature4	Feature5	Feature6	Sex	Loc	Disease	IntFactor
+	float:name1				int:name2				factor	string	factor	int
+Sample1_p1		1.00E+07	1.34E+06	2.49E+05		1.00E+00	2.00E+00	3.00E+00	M	Hos1	No	4
+Sample2_p1		2.00E+07		2.30E+05		4	5	6			Yes	
+Sample3		2.50E+07	3.00E+06			7	8	9	F	Hos2		5
+	float											
+Sample4		3.14E+00	2.17	1.18								
+Sample5		7.54E+00	8.43	9.45								
+mz	float	35.67		102.36								
+rt	float	1200	1502	1502								
+polarity	factor	pos	pos	neg								
+type	factor	mean	sd	mean 								
+IntMetaFeature	int	7		9								
+CovariateExplanation									M or F	Location	No or Yes	Random Factor

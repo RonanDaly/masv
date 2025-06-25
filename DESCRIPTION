@@ -7,3 +7,6 @@ License: None
 Author: Ronan Daly <ronan@dalyr.com> [aut, cre]
 Encoding: UTF-8
 Maintainer: Ronan Daly <ronan@dalyr.com>
+Imports: usethis, testthat, Biobase
+Config/testthat/edition: 3
+Remotes: bioc::release/Biobase

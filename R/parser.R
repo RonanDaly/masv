@@ -1,10 +1,10 @@
 # MASV File Format
 # ----------------
 # A MASV file is a tab-seperated file that is used to store data and metadata.
-# In a version 1 file, the data consists of multiple named features, all of the same type and
+# In a version 1 file, the data consists of sets of multiple named features, each element of the same type and
 # a number of samples. The metadata consists of named features associated with the
 # samples, such as covariates and experimental conditions and named meta-features associated
-# with the features. Each covariate and meta-feature has it's own type.
+# with the features and the covariates. Each covariate and meta-feature has it's own type.
 # The data and metadata can have missing values which are given as an empty cell.
 # The file can be thought of as a sequence of rows, each of which contains a number of cells,
 # seperated by tabs
@@ -14,30 +14,46 @@
 # * string: A string type
 # * int: An integer type
 # * factor: A factor type
-# * date: A data, time or date-time in ISO 8601 format
+# * date: A date, time or date-time in ISO 8601 format
+#
+# A type-name specifier consists of a string in one of the following formats:
+# <type>
+# <type>:<name>
+# where <type> is one of the types above and <name> is a string that can be used as an identifier.
+#
+# Feature data in this file format are organised in blocks, consisting of a type-name specifier, a group of features
+# and a group of samples.
+# The cell at the first row and column of a block is where the type-name specifier is stored. The rest of the first row and first
+# column of the block are empty, with the feature data following in the rest of the block. Each cell in the feature
+# data corresponds to a feature value, with the feature name being given in the corresponding column of the top row of the data
+# and the sample name being given in the corresponding row of the left column of the data. Blocks cannot overlap. The cell on
+# the left column of the first row of a block is always empty. Blocks with the same set of feature names and same set of sample
+# are considered to be measuring different aspects of the same measurement process. Blocks are associated with the name in the
+# type-name specifier if it exists.
 #
 # The first row consists of the following:
 # * The first cell is the string "MASV:1", where "1" stands for the version of the standard
-# * Next comes a blank cell
-# * Next come the names of all the features in the data, one for each cell
+# * Next comes a cell that can be used to indicate a subtype of the file format
+# * Next come the names of all the features in the data, one for each cell. The names are grouped
+#   according to the blocks they correspond to. Because of the block structure of the feature data,
+#   there is a blank cell between each of the groups.
 # * Next come the names of all the covariates, one for each cell
 #
-# The second row consists of the following:
-# * The first cell is blank
-# * The next cell contains the type of the data
-# * Next come blank cells, one for each for each data feature
-# * Next come type cells, one for each covariate
-#
-# From then on, each row consists of:
-# * The first cell is the name of a sample
-# * Next comes a blank cell
-# * Next come data value cells, one for each feature
+# From the second row onwards, the file consists of blocks of data.
+# Each row consists of:
+# * The first cell is the name of a sample, or blank if the row is the first row in a block
+# * If we are in the first row of a block, then blank cells until we reach a type-name specifier. This continues for the res
+#   of the row.
+# * Otherwise blank cells until we reach a data value cell. This continues for the rest of the row, with blank cells corresponding
+#   to partititons between blocks.
 # * Next come covariate value cells, one for each covariate
+# The second row itself is special and also contains type specifiers for the covariates after the
+# columns for the features.
 #
 # After this, each row consists of:
-# * The first cell is the name of a meta-feature
-# * Next comes a type cell of that meta-feature,
-# * Next come meta-feature values cells, one for each feature
+# * The first cell is the name of a meta-feature.
+# * Next comes a type cell of that meta-feature.
+# * Next come meta-feature values cells, one for each feature or covariate.
 
 checkMASVFile = function(topLeft) {
   split = strsplit(topLeft, ':', fixed=TRUE)[[1]]
