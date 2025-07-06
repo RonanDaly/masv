@@ -285,6 +285,8 @@ parseMultiDatSet = function(filename) {
   
   for (i in 1:length(e_sets)) {
     e_set = e_sets[[i]]
+    print('a')
+    e_set
     multi = add_eset(multi, e_set, dataset.type = group_names[[i]], GRanges = NA)
   }
   
@@ -297,7 +299,7 @@ parseMultiDatSet = function(filename) {
 #print(feature_groups['factor'])
 #test_data = data['data'][[1]]
 #group = test_data[[2]]
-e_sets = parseExpressionSets('./inst/masv2test.tsv')
-e_set = e_sets[[2]]
+#e_sets = parseExpressionSets('./inst/masv2test.tsv')
+#e_set = e_sets[[2]]
 
 multi = parseMultiDatSet('./inst/masv2test.tsv')
