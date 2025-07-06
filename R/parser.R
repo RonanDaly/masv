@@ -118,21 +118,22 @@ parseMASVFile = function(filename) {
   #dataType = secondCols[2]
   
   
-  feature_groups = c()
+  feature_groups = list()
   group_names = c()
  
   featureNamesStart = 3
   featureNamesEnd = 3
   
   current_type = NULL
-  group_start = 0
+  group_start = 3
   group_end = 0
-  for (i in 3:length(secondCols)){
-    print(i)
+  for (i in 2:length(secondCols)){
+    #print(i)
     if ( secondCols[i] != "" ){
-      print(secondCols[i])
+      #print(secondCols[i])
       if (group_end > group_start) {
-        feature_groups = append(feature_groups,c(current_type, group_start, group_end))
+        #feature_groups = append(feature_groups,c(current_type, group_start, group_end))
+        feature_groups[[length(feature_groups)+1]] = list(current_type, group_start, group_end)
         group_names = append(group_names,thirdCols[i])
         featureNamesEnd = group_end
       }
@@ -154,14 +155,20 @@ parseMASVFile = function(filename) {
   featureNames = as.character(unlist(firstCols[featureNamesStart:featureNamesEnd]))
   covariateNames = as.character(unlist(firstCols[covariateNamesStart:covariateNamesEnd]))
 
+  #close(con)
+  #return(feature_groups)
+  
   # Create empty vector to store data
-  data = c()
+  data = list()
+  iter = 1
   for (group in feature_groups) {
-    data = append(data,vector(getRType(group[0]), 0))
+    #print(group)
+    data[[iter]] = vector(getRType(group[1]), 0)
+    iter = iter + 1
   }
   
-  close(con)
-  return(data)
+  #close(con)
+  #return(data)
   
   # Create dataframe to store covariates
   covariates = data.frame(matrix(nrow=0, ncol=length(covariateNames), dimnames=list(NULL, covariateNames)))
@@ -189,15 +196,18 @@ parseMASVFile = function(filename) {
       
       # Parse the data for this sample
       for (i in 1:length(feature_groups)) {
-        group_start = feature_groups[1][2]
-        group_end = feature_groups[1][3]
-        parsedData = parseData(cols[feature:featureNamesEnd], dataType)
-        data = append(data,vector(getRType(group[0]), 0))
+        group = unlist(feature_groups[[i]])
+        group_start = as.integer(group[2])
+        group_end = as.integer(group[3])
+        dataType = group[1]
+        #print(group_end)
+        parsedData = parseData(cols[group_start:group_end], dataType)
+        data[[i]] = append(data[[i]],parsedData)
       }
       
-      parsedData = parseData(cols[featureNamesStart:featureNamesEnd], dataType)
+      #parsedData = parseData(cols[featureNamesStart:featureNamesEnd], dataType)
       
-      data = append(data, parsedData)
+      #data = append(data, parsedData)
 
       covariateRow = cols[covariateNamesStart:covariateNamesEnd]
       covariates[nrow(covariates) + 1,] = covariateRow
@@ -216,36 +226,78 @@ parseMASVFile = function(filename) {
 
   # Close the file
   close(con)
-
-  # Convert data to a matrix
-  dim(data) = c(length(featureNames), nrow(covariates))
-  dimnames(data) = list(featureNames, sampleNames)
-
-  # Convert covariates to a data frame
-  rownames(covariates) = sampleNames
-  for ( i in 1:ncol(covariates) ) {
-    covariates[,i] = parseData(covariates[,i], secondCols[covariateNamesStart + i - 1])
+  #return(data)
+  #print(featureNames)
+  for (i in 1:length(feature_groups)) {
+      group = unlist(feature_groups[[i]])
+      group_start = as.integer(group[2]) - 2 
+      group_end = as.integer(group[3]) - 2
+      #group_length = group_end - group_start
+      group_feature_names = featureNames[group_start:group_end]
+      # Convert data to a matrix
+      dim(data[[i]]) = c(length(group_feature_names), nrow(covariates))
+      dimnames(data[[i]]) = list(group_feature_names, sampleNames)
   }
-
-  # Convert meta-features to a data frame
-  metaFeatures = as.data.frame(metaFeatures)
-  rownames(metaFeatures) = featureNames
-
+  
+    # Convert covariates to a data frame
+    rownames(covariates) = sampleNames
+    for ( i in 1:ncol(covariates) ) {
+      covariates[,i] = parseData(covariates[,i], secondCols[covariateNamesStart + i - 1])
+    }
+  
+    # Convert meta-features to a data frame
+    metaFeatures = as.data.frame(metaFeatures)
+    rownames(metaFeatures) = featureNames
+  
   # Return the data
-  list(data=data, covariates=covariates, metaFeatures=metaFeatures)
+    return(list(data=data, covariates=covariates, metaFeatures=metaFeatures,feature_groups=feature_groups, group_names=group_names))
 }
 
-parseExpressionSet = function(filename) {
+parseExpressionSets = function(filename) {
   parsedData = parseMASVFile(filename)
   data = parsedData$data
   covariates = parsedData$covariates
   metaFeatures = parsedData$metaFeatures
-
-  # Create an ExpressionSet
-  eset = Biobase::ExpressionSet(assayData=data,
-                       phenoData=Biobase::AnnotatedDataFrame(covariates),
-                       featureData=Biobase::AnnotatedDataFrame(metaFeatures))
-  eset
+  feature_groups = parsedData$feature_groups
+  group_names = parsedData$group_names
+  
+  e_sets = list()
+  for (i in 1:length(data)) {
+    group_data = data[[i]]
+    group = unlist(feature_groups[[i]])
+    group_start = as.integer(group[2]) - 2 
+    group_end = as.integer(group[3]) - 2
+    group_metafeatures = metaFeatures[group_start:group_end,]
+    # Create an ExpressionSet
+    e_set = Biobase::ExpressionSet(assayData=group_data,
+                         phenoData=Biobase::AnnotatedDataFrame(covariates),
+                         featureData=Biobase::AnnotatedDataFrame(group_metafeatures))
+    e_sets[[i]] = e_set
+  }
+  return(list(e_sets=e_sets, group_names=group_names))
 }
 
-feature_groups = parseMASVFile('./inst/masv2test.tsv')
+parseMultiDatSet = function(filename) {
+  multi = createMultiDataSet()
+  e_set_list = parseExpressionSets(filename)
+  e_sets = e_set_list$e_sets
+  group_names = e_set_list$group_names
+  
+  for (i in 1:length(e_sets)) {
+    e_set = e_sets[[i]]
+    multi = add_eset(multi, e_set, dataset.type = group_names[[i]], GRanges = NA)
+  }
+  
+  return(multi)
+}
+
+#data = parseMASVFile('./inst/masv2test.tsv')
+#meta_feats = data$metaFeatures[1:3,]
+#class(meta_feats)
+#print(feature_groups['factor'])
+#test_data = data['data'][[1]]
+#group = test_data[[2]]
+e_sets = parseExpressionSets('./inst/masv2test.tsv')
+e_set = e_sets[[2]]
+
+multi = parseMultiDatSet('./inst/masv2test.tsv')
