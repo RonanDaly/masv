@@ -90,3 +90,52 @@ eSetToMASV = function(eset, filename) {
   close(con)
 }
 
+multi_data_set_to_masv = function(multi, filename) {
+  # Open connection
+  con = file(filename, open='w')
+  
+  data_sets = list()
+  dataTypes = list()
+  feature_sets = list()
+  sets_metafeatures = list()
+  
+  for ( set in names(multi)) {
+    # Get data
+    data = assayData(multi[,set])
+    data = data[[1]]
+    data = data$exprs
+    data_sets[[set]] = data
+    
+    # Get feature names
+    feature_sets[[set]] = list(rownames(data))
+    #feature_names = c(feature_names, rownames(data))
+    
+    # Get data type
+    dataType = getMASVType(type(data))
+    dataTypes[set] = dataType
+    
+    # Get meta-feature data
+    f_data = fData(multi[,set])
+    f_data = f_data[[1]]
+    sets_metafeatures[[set]] = f_data
+  }
+  
+  # Get sample names
+  first_data_set = names(data_sets)[1]
+  sampleNames = colnames(data_sets[[first_data_set]])
+  
+  # Get covariate names
+  covariates = pData(multi[,first_data_set])[[1]]
+  covariates[length(covariates)] = NULL
+  covariateNames = colnames(covariates)
+  
+  # Get meta-feature names
+  metaFeatureNames = colnames(sets_metafeatures[first_data_set])
+  
+  # Get version
+  version = 1
+  # Get top left
+  topLeft = paste0('MASV:', version)
+  
+  
+}
