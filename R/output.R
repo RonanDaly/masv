@@ -137,5 +137,26 @@ multi_data_set_to_masv = function(multi, filename) {
   # Get top left
   topLeft = paste0('MASV:', version)
   
+  # Get feature names
+  feature_names = ''
+  num_features = 0
+  for (features in feature_sets) {
+    num_features = num_features + length(features[[1]]
+    features_str = paste('', paste(features[[1]], collapse = '\t'), sep='\t')
+    if (nchar(feature_names) > 1){
+      feature_names = paste(feature_names, features_str, sep='\t')
+    } else {
+      feature_names = features_str
+    }
+  }
+
   
+  # Get and write first row string
+  firstRow = paste(topLeft, feature_names, paste0(covariateNames, collapse='\t'), sep='\t')
+  writeLines(firstRow, con)
+  
+  # Close connection
+  close(con)
 }
+
+multi_data_set_to_masv(multi, './inst/output_test.tsv')
