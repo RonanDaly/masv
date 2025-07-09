@@ -130,18 +130,16 @@ multi_data_set_to_masv = function(multi, filename) {
   covariateNames = colnames(covariates)
   
   # Get meta-feature names
-  metaFeatureNames = colnames(sets_metafeatures[first_data_set])
+  metaFeatureNames = colnames(sets_metafeatures[[first_data_set]])
   
   # Get version
   version = 1
   # Get top left
   topLeft = paste0('MASV:', version)
   
-  # Get feature names
+  # Get feature names and number of columns for features
   feature_names = ''
-  num_features = 0
   for (features in feature_sets) {
-    num_features = num_features + length(features[[1]]
     features_str = paste('', paste(features[[1]], collapse = '\t'), sep='\t')
     if (nchar(feature_names) > 1){
       feature_names = paste(feature_names, features_str, sep='\t')
@@ -154,6 +152,62 @@ multi_data_set_to_masv = function(multi, filename) {
   # Get and write first row string
   firstRow = paste(topLeft, feature_names, paste0(covariateNames, collapse='\t'), sep='\t')
   writeLines(firstRow, con)
+  
+  # Get covariate types
+  covariateTypes = sapply(covariates, function(x) getMASVType(class(x)))
+  
+  #firstRow = topLeft
+  secondRow = ''
+  thirdRow = ''
+  for (set in names(data_sets)) {
+    dataType = dataTypes[set][[1]]
+    features = feature_sets[set][[1]][[1]]
+    secondRow = paste(secondRow, dataType, paste(rep('', length(features)), collapse='\t'), sep='\t')
+    thirdRow = paste(thirdRow, set, paste(rep('', length(features)), collapse='\t'), sep='\t')
+  }
+  
+  secondRow = paste(secondRow, paste(covariateTypes, collapse='\t'), sep='\t')
+  thirdRow = paste(thirdRow, paste(rep('', length(covariates)), collapse='\t'), sep='\t')
+  print(thirdRow)
+  
+  writeLines(secondRow, con)
+  writeLines(thirdRow, con)
+  
+  for (i in 1:length(sampleNames)) {
+    row = sampleNames[i]
+    
+    for (set in names(data_sets)) {
+      a_data = data_sets[[set]]
+      row = paste(row, '', paste0(convertNAs(a_data[,i]), collapse='\t'), sep='\t')
+    }
+    # Get row string
+    row = paste(row, paste0(convertNAs(covariates[i,]), collapse='\t'), sep='\t')
+    # Write row string
+    writeLines(row, con)
+  }
+  
+  for ( i in 1:length(metaFeatureNames) ) {
+    metaFeatureType = getMASVType(class(sets_metafeatures[[first_data_set]][,i]))
+    
+    # Get row string
+    row = paste(metaFeatureNames[i], metaFeatureType,sep='\t')
+    first_set = TRUE
+    for (set in names(data_sets)) {
+      meta_data = sets_metafeatures[[set]][,i]
+      #t = paste0(convertNAs(meta_data[,1]), collapse='\t')
+      #t = convertNAs(meta_data[,1])
+      if (first_set == TRUE) {
+        row = paste(row, paste0(convertNAs(meta_data), collapse='\t'), sep='\t')
+      } else {
+        row = paste(row, '', paste0(convertNAs(meta_data), collapse='\t'), sep='\t')
+      }
+      first_set = FALSE
+    }
+    
+    row = paste(row, paste(rep('', length(covariateNames)), collapse='\t'), sep='\t')
+    # Write row string
+    writeLines(row, con)
+  }
   
   # Close connection
   close(con)
