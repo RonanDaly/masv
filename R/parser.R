@@ -134,7 +134,7 @@ parseMASVFile = function(filename) {
       if (group_end > group_start) {
         #feature_groups = append(feature_groups,c(current_type, group_start, group_end))
         feature_groups[[length(feature_groups)+1]] = list(current_type, group_start, group_end)
-        group_names = append(group_names,thirdCols[i])
+        group_names = append(group_names,thirdCols[group_start-1])
         featureNamesEnd = group_end
       }
       
@@ -285,7 +285,6 @@ parseMultiDatSet = function(filename) {
   
   for (i in 1:length(e_sets)) {
     e_set = e_sets[[i]]
-    print('a')
     e_set
     multi = add_eset(multi, e_set, dataset.type = group_names[[i]], GRanges = NA)
   }
