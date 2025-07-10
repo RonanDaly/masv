@@ -97,6 +97,8 @@ parseData = function(cols, dataType) {
 # Parse a row of 
 #parseFeatureGroups
 
+
+
 parseMASVFile = function(filename) {
   con = file(filename, open='r')
   firstLine = readLines(con, n=1, ok=FALSE)
@@ -174,9 +176,12 @@ parseMASVFile = function(filename) {
   covariates = data.frame(matrix(nrow=0, ncol=length(covariateNames), dimnames=list(NULL, covariateNames)))
   sampleNames = c()
   metaFeatures = list()
-
+  line_num = 3
+  
   while (TRUE) {
     line = readLines(con, n=1, warn=FALSE)
+    line_num = line_num + 1
+    
     if ( length(line) == 0 ) {
       break
     }
@@ -201,7 +206,16 @@ parseMASVFile = function(filename) {
         group_end = as.integer(group[3])
         dataType = group[1]
         #print(group_end)
-        parsedData = parseData(cols[group_start:group_end], dataType)
+        #parsedData = parseData(cols[group_start:group_end], dataType)
+        
+        parsedData = tryCatch({
+          parseData(cols[group_start:group_end], dataType)
+        }, warning = function(war) {
+          warning(paste('Warning in line:', line_num, ';-', war, sep=' '))
+        }, error = function(err) {
+          stop(paste('Error in line:', line_num, ';-', err, sep=' '))
+        })
+        
         data[[i]] = append(data[[i]],parsedData)
       }
       
@@ -243,6 +257,7 @@ parseMASVFile = function(filename) {
     rownames(covariates) = sampleNames
     for ( i in 1:ncol(covariates) ) {
       covariates[,i] = parseData(covariates[,i], secondCols[covariateNamesStart + i - 1])
+      
     }
   
     # Convert meta-features to a data frame
@@ -301,4 +316,4 @@ parseMultiDatSet = function(filename) {
 #e_sets = parseExpressionSets('./inst/masv2test.tsv')
 #e_set = e_sets[[2]]
 
-multi = parseMultiDatSet('./inst/masv2test.tsv')
+multi_test = parseMultiDatSet('./inst/masv3test.tsv')
