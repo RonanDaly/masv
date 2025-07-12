@@ -211,9 +211,13 @@ parseMASVFile = function(filename) {
         parsedData = tryCatch({
           parseData(cols[group_start:group_end], dataType)
         }, warning = function(war) {
-          warning(paste('Warning in line:', line_num, ';-', war, sep=' '))
+          war$message = paste(war$message, ' (in line: ', line_num, ')')
+          warning(war)
+          return(parseData(cols[group_start:group_end], dataType))
+          #return(p_d)
         }, error = function(err) {
-          stop(paste('Error in line:', line_num, ';-', err, sep=' '))
+          err$message = paste(err$message, ' (in line: ', line_num, ')')
+          stop(err)
         })
         
         data[[i]] = append(data[[i]],parsedData)
