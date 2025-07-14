@@ -79,18 +79,43 @@ getRType = function(masvDataType) {
 # cols: A vector of strings, each of which is a cell in the row
 # dataType: The type of the data in the row. Either 'float', 'string', 'int', 'factor' or 'date',
 parseData = function(cols, dataType) {
-  if ( dataType == 'float' ) {
-    as.numeric(cols)
-  } else if ( dataType == 'string' ) {
-    cols
-  } else if ( dataType == 'int' ) {
-    as.integer(cols)
+  rType = getRType(dataType)
+  
+  # Initialise empty return vector`
+  return_cols = rep(NA,length(cols))
+  
+  for (i in 1:length(cols)) {
+    return_cols[i] = tryCatch({
+      value = convert_string(cols[i])
+      if ( is.na(value) ) {
+        if ( cols[i] != '') {
+          stop('unable to convert data')
+        }
+      return(value)
+      }
+    }, error = function(err) {
+      err$message = paste('-COL-', i, '-COL-', err$message)
+      stop(err)
+    })
+  }
+  return(return_cols)
+}
+
+# Simple funtion which can takes a string
+# and returns it converted to another type (no idea why there is nothing like this in base R)
+convert_string = function(str, type) {
+  if (type == 'numeric' ) {
+    as.numeric(str)
+  } else if ( dataType == 'character' ) {
+    str
+  } else if ( type == 'integer' ) {
+    as.integer(str)
   } else if ( dataType == 'factor' ) {
-    factor(cols, exclude='')
+    factor(str, exclude='')
   } else if ( dataType == 'date' ) {
-    as.POSIXct(cols)
+    as.POSIXct(str)
   } else {
-    stop('Unknown MASV type: ', dataType)
+    return(NA)
   }
 }
 
@@ -216,7 +241,14 @@ parseMASVFile = function(filename) {
           return(parseData(cols[group_start:group_end], dataType))
           #return(p_d)
         }, error = function(err) {
+          if ( startsWith(err$message,'-ROW-')){
+            err_message = str_split_fixed(test, "-ROW-",3)
+            row = as.integer(err_message[2]) + group_start
+            message = err_message[3]
+            err$message = paste(message, ' (in position: ', line_num,':',row,')')
+          } else {
           err$message = paste(err$message, ' (in line: ', line_num, ')')
+          }
           stop(err)
         })
         
