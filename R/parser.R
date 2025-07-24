@@ -85,15 +85,24 @@ parseData = function(cols, dataType) {
   return_cols = rep(NA,length(cols))
   
   for (i in 1:length(cols)) {
-    return_cols[i] = tryCatch({
+    #value = NULL
+    return_cols[i]= tryCatch({
       value = convert_string(cols[i], rType)
       if ( is.na(value) ) {
         if ( cols[i] != '') {
           stop('unable to convert data')
         }
-      return(value)
       }
+      print('a')
+      print(value)
+      return(value)
+      }, warning = function(war) {
+        war$message = paste('-COL-', i, '-COL-', war$message)
+        warning(war)
+        return(convert_string(cols[i], rType))
+        #return(p_d)
     }, error = function(err) {
+      
       err$message = paste('-COL-', i, '-COL-', err$message)
       stop(err)
     })
@@ -106,15 +115,15 @@ parseData = function(cols, dataType) {
 convert_string = function(str, type) {
   if (type == 'numeric' ) {
     as.numeric(str)
-  } else if ( dataType == 'double' ) {
+  } else if ( type == 'double' ) {
     as.numeric(str)
-  } else if ( dataType == 'character' ) {
+  } else if ( type == 'character' ) {
     str
   } else if ( type == 'integer' ) {
     as.integer(str)
-  } else if ( dataType == 'factor' ) {
+  } else if ( type == 'factor' ) {
     factor(str, exclude='')
-  } else if ( dataType == 'date' ) {
+  } else if ( type == 'date' ) {
     as.POSIXct(str)
   } else {
     return(NA)
