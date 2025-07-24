@@ -86,7 +86,7 @@ parseData = function(cols, dataType) {
   
   for (i in 1:length(cols)) {
     return_cols[i] = tryCatch({
-      value = convert_string(cols[i])
+      value = convert_string(cols[i], rType)
       if ( is.na(value) ) {
         if ( cols[i] != '') {
           stop('unable to convert data')
@@ -105,6 +105,8 @@ parseData = function(cols, dataType) {
 # and returns it converted to another type (no idea why there is nothing like this in base R)
 convert_string = function(str, type) {
   if (type == 'numeric' ) {
+    as.numeric(str)
+  } else if ( dataType == 'double' ) {
     as.numeric(str)
   } else if ( dataType == 'character' ) {
     str
@@ -241,8 +243,8 @@ parseMASVFile = function(filename) {
           return(parseData(cols[group_start:group_end], dataType))
           #return(p_d)
         }, error = function(err) {
-          if ( startsWith(err$message,'-ROW-')){
-            err_message = str_split_fixed(test, "-ROW-",3)
+          if ( startsWith(err$message,'-COL-')){
+            err_message = str_split_fixed(err$message, "-COL-",3)
             row = as.integer(err_message[2]) + group_start
             message = err_message[3]
             err$message = paste(message, ' (in position: ', line_num,':',row,')')
@@ -352,4 +354,4 @@ parseMultiDatSet = function(filename) {
 #e_sets = parseExpressionSets('./inst/masv2test.tsv')
 #e_set = e_sets[[2]]
 
-multi_test = parseMultiDatSet('./inst/masv3test.tsv')
+multi_test = parseMultiDatSet('./inst/masv2test.tsv')
