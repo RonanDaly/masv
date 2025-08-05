@@ -75,6 +75,32 @@ getRType = function(masvDataType) {
   }
 }
 
+parseCell = function(cell_data, rType, col_num) {
+  
+  return_value = tryCatch({
+    value = convert_string(cell_data, rType)
+    if ( is.na(value) ) {
+      if (cell_data != '') {
+        stop('unable to convert data')
+      }
+    }
+    #print('a')
+    #print(value)
+    return(value)
+  }, warning = function(war) {
+    war$message = paste('-COL-', col_num, '-COL-', war$message)
+    warning(war)
+    value = convert_string(cell_data, rType)
+    #return(convert_string(cols[i], rType))
+    #return(p_d)
+  }, error = function(err) {
+    
+    err$message = paste('-COL-', col_num, '-COL-', err$message)
+    stop(err)
+  })
+  return(return_value)
+}
+
 # Parse a row of data.
 # cols: A vector of strings, each of which is a cell in the row
 # dataType: The type of the data in the row. Either 'float', 'string', 'int', 'factor' or 'date',
@@ -86,27 +112,33 @@ parseData = function(cols, dataType) {
   
   for (i in 1:length(cols)) {
     #value = NULL
-    return_cols[i]= tryCatch({
+    print(i)
+    return_cols[i] = tryCatch({
       value = convert_string(cols[i], rType)
       if ( is.na(value) ) {
         if ( cols[i] != '') {
           stop('unable to convert data')
         }
       }
-      print('a')
-      print(value)
-      return(value)
+      #print('a')
+      #print(value)
+      #return(value)
       }, warning = function(war) {
         war$message = paste('-COL-', i, '-COL-', war$message)
         warning(war)
-        return(convert_string(cols[i], rType))
+        value = convert_string(cols[i], rType)
+        #return(convert_string(cols[i], rType))
         #return(p_d)
     }, error = function(err) {
       
       err$message = paste('-COL-', i, '-COL-', err$message)
       stop(err)
     })
+    
+    print('a')
+    print(return_cols[i])
   }
+  
   return(return_cols)
 }
 
@@ -263,6 +295,7 @@ parseMASVFile = function(filename) {
           stop(err)
         })
         
+        #print(parsedData)
         data[[i]] = append(data[[i]],parsedData)
       }
       
@@ -284,10 +317,15 @@ parseMASVFile = function(filename) {
       metaFeatures[[metaFeatureName]] = parsedMetaFeatureData
     }
   }
-
+  
+  
   # Close the file
   close(con)
+  
+  print(featureNames)
   #return(data)
+  #return(covariates)
+  
   #print(featureNames)
   for (i in 1:length(feature_groups)) {
       group = unlist(feature_groups[[i]])
@@ -296,6 +334,10 @@ parseMASVFile = function(filename) {
       #group_length = group_end - group_start
       group_feature_names = featureNames[group_start:group_end]
       # Convert data to a matrix
+      
+      #print(length(group_feature_names))
+      #print(nrow(covariates))
+      
       dim(data[[i]]) = c(length(group_feature_names), nrow(covariates))
       dimnames(data[[i]]) = list(group_feature_names, sampleNames)
   }
@@ -305,7 +347,7 @@ parseMASVFile = function(filename) {
     for ( i in 1:ncol(covariates) ) {
       covariates[,i] = parseData(covariates[,i], secondCols[covariateNamesStart + i - 1])
       
-    }
+    } 
   
     # Convert meta-features to a data frame
     metaFeatures = as.data.frame(metaFeatures)
@@ -354,13 +396,17 @@ parseMultiDatSet = function(filename) {
   return(multi)
 }
 
-#data = parseMASVFile('./inst/masv2test.tsv')
+test = parseMASVFile('./inst/masv2test.tsv')
+
 #meta_feats = data$metaFeatures[1:3,]
 #class(meta_feats)
 #print(feature_groups['factor'])
-#test_data = data['data'][[1]]
+#test_data = data[[1]]
+#nrow(covariates[[1]])
+#dim(data[[1]]) = c(3,nrow(covariates))
+
 #group = test_data[[2]]
 #e_sets = parseExpressionSets('./inst/masv2test.tsv')
 #e_set = e_sets[[2]]
 
-multi_test = parseMultiDatSet('./inst/masv2test.tsv')
+#multi_test = parseMultiDatSet('./inst/masv2test.tsv')
