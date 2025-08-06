@@ -168,7 +168,6 @@ multi_data_set_to_masv = function(multi, filename) {
   
   secondRow = paste(secondRow, paste(covariateTypes, collapse='\t'), sep='\t')
   thirdRow = paste(thirdRow, paste(rep('', length(covariates)), collapse='\t'), sep='\t')
-  print(thirdRow)
   
   writeLines(secondRow, con)
   writeLines(thirdRow, con)
@@ -213,4 +212,4 @@ multi_data_set_to_masv = function(multi, filename) {
   close(con)
 }
 
-multi_data_set_to_masv(multi, './inst/output_test.tsv')
+#multi_data_set_to_masv(multi_test, './inst/output_test2.tsv')

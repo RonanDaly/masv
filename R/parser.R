@@ -364,7 +364,6 @@ test = parseMASVFile('./inst/masv2test.tsv')
 
 #meta_feats = data$metaFeatures[1:3,]
 #class(meta_feats)
-#print(feature_groups['factor'])
 #test_data = data[[1]]
 #nrow(covariates[[1]])
 #dim(data[[1]]) = c(3,nrow(covariates))
