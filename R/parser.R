@@ -110,12 +110,14 @@ parseData = function(cols, dataType) {
   for (i in 1:length(cols)) {
     return_cols[i] = parseCell(cols[i], rType, i)
   }
-  
+  if (rType == 'factor'){
+    return_cols = factor(cols, exclude='')
+  }
   return(return_cols)
 }
 
 # Simple funtion which can takes a string
-# and returns it converted to another type (no idea why there is nothing like this in base R)
+# and returns it converted to another type 
 convert_string = function(str, type) {
   if (type == 'numeric' ) {
     as.numeric(str)
@@ -309,6 +311,7 @@ parseMASVFile = function(filename) {
     } 
   
     # Convert meta-features to a data frame
+    #return(metaFeatures)
     metaFeatures = as.data.frame(metaFeatures)
     rownames(metaFeatures) = featureNames
   
@@ -355,7 +358,9 @@ parseMultiDatSet = function(filename) {
   return(multi)
 }
 
-#test = parseMASVFile('./inst/masv2test.tsv')
+test = parseMASVFile('./inst/masv2test.tsv')
+
+
 
 #meta_feats = data$metaFeatures[1:3,]
 #class(meta_feats)
