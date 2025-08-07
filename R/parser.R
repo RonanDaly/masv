@@ -39,6 +39,10 @@
 # * Next comes a type cell of that meta-feature,
 # * Next come meta-feature values cells, one for each feature
 
+
+#' Checks masv file is valid
+#'
+#' @param topLeft A string.
 checkMASVFile = function(topLeft) {
   split = strsplit(topLeft, ':', fixed=TRUE)[[1]]
   if ( split[1] != "MASV") {
@@ -53,12 +57,19 @@ checkMASVFile = function(topLeft) {
   )
 }
 
+#' Get version number of MASV file
+#'
+#' @param topLeft A string.
+#' @returns A number
 getMASVVersion = function(topLeft) {
   split = strsplit(topLeft, ':', fixed=TRUE)[[1]]
   as.integer(split[2])
 }
 
-# Get R type of given data type
+#' Get R type of given data type
+#'
+#' @param masvDataType A string.
+#' @returns A string
 getRType = function(masvDataType) {
   if ( masvDataType == 'float' ) {
     'double'
@@ -75,6 +86,12 @@ getRType = function(masvDataType) {
   }
 }
 
+#' Parse data from a single cell
+#' 
+#' @param cell_data A string.
+#' @param rType A string.
+#' @param col_num A integer.
+#' @returns A string
 parseCell = function(cell_data, rType, col_num) {
   return_value = tryCatch({
     value = convert_string(cell_data, rType)
@@ -98,9 +115,13 @@ parseCell = function(cell_data, rType, col_num) {
   return(return_value)
 }
 
-# Parse a row of data.
+#' Parse a row of data.
+#' 
 # cols: A vector of strings, each of which is a cell in the row
 # dataType: The type of the data in the row. Either 'float', 'string', 'int', 'factor' or 'date',
+#' @param cols A string vector.
+#' @param dataType A string.
+#' @returns A string vector
 parseData = function(cols, dataType) {
   rType = getRType(dataType)
   
@@ -116,8 +137,11 @@ parseData = function(cols, dataType) {
   return(return_cols)
 }
 
-# Simple funtion which can takes a string
-# and returns it converted to another type 
+#' Simple funtion which can takes a string and returns it converted to another type
+#' 
+#' @param str A string.
+#' @param type A string.
+#' @returns A string
 convert_string = function(str, type) {
   if (type == 'numeric' ) {
     as.numeric(str)
@@ -139,8 +163,10 @@ convert_string = function(str, type) {
 # Parse a row of 
 #parseFeatureGroups
 
-
-
+#' Parse data from MASV FILE
+#' 
+#' @param filename A string.
+#' @returns A list
 parseMASVFile = function(filename) {
   con = file(filename, open='r')
   firstLine = readLines(con, n=1, ok=FALSE)
@@ -319,6 +345,10 @@ parseMASVFile = function(filename) {
     return(list(data=data, covariates=covariates, metaFeatures=metaFeatures,feature_groups=feature_groups, group_names=group_names))
 }
 
+#' Parse MASV file to list of ExpressionSets
+#' 
+#' @param filename A string.
+#' @returns A list
 parseExpressionSets = function(filename) {
   parsedData = parseMASVFile(filename)
   data = parsedData$data
@@ -343,6 +373,10 @@ parseExpressionSets = function(filename) {
   return(list(e_sets=e_sets, group_names=group_names))
 }
 
+#' Parse MASV file to MultiDataSet
+#' 
+#' @param filename A string.
+#' @returns A MultiDataSet
 parseMultiDatSet = function(filename) {
   multi = createMultiDataSet()
   e_set_list = parseExpressionSets(filename)

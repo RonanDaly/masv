@@ -1,6 +1,9 @@
 # Output eSet to masv file
 
-# Get MASV type of given R type
+#' Get MASV type of given R type
+#'
+#' @param rType A string.
+#' @returns A string
 getMASVType = function(rType) {
   if ( rType == 'double' || rType == 'numeric' ) {
     'float'
@@ -17,7 +20,10 @@ getMASVType = function(rType) {
   }
 }
 
-# Get data type of eSet
+#' Get data type of eSet
+#'
+#' @param eset A ExpressionSet.
+#' @returns A string
 getMASVDataType = function(eset) {
   # Get assay data
   assayData = Biobase::exprs(eset)
@@ -29,13 +35,20 @@ getMASVDataType = function(eset) {
   dataType
 }
 
-# Convert NAs to empty character strings
+#' Convert NAs to empty character strings
+#'
+#' @param x A string vector.
+#' @returns A string vector.
 convertNAs = function(x) {
   x = sapply(x, as.character)
   x[is.na(x)] = ''
   x
 }
 
+#' Write MASV file from ExpressionSet
+#'
+#' @param eset A ExpressionSet.
+#' @param filename A string.
 eSetToMASV = function(eset, filename) {
   # Open connection
   con = file(filename, open='w')
@@ -90,6 +103,10 @@ eSetToMASV = function(eset, filename) {
   close(con)
 }
 
+#' Write MASV file from MultiDataSet
+#'
+#' @param multi A MultiDataSet.
+#' @param filename A string.
 multi_data_set_to_masv = function(multi, filename) {
   # Open connection
   con = file(filename, open='w')
