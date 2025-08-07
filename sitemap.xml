@@ -2,6 +2,20 @@
 <url><loc>/404.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/checkMASVFile.html</loc></url>
+<url><loc>/reference/convertNAs.html</loc></url>
+<url><loc>/reference/convert_string.html</loc></url>
+<url><loc>/reference/eSetToMASV.html</loc></url>
+<url><loc>/reference/getMASVDataType.html</loc></url>
+<url><loc>/reference/getMASVType.html</loc></url>
+<url><loc>/reference/getMASVVersion.html</loc></url>
+<url><loc>/reference/getRType.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/multi_data_set_to_masv.html</loc></url>
+<url><loc>/reference/parseCell.html</loc></url>
+<url><loc>/reference/parseData.html</loc></url>
+<url><loc>/reference/parseExpressionSets.html</loc></url>
+<url><loc>/reference/parseMASVFile.html</loc></url>
+<url><loc>/reference/parseMultiDatSet.html</loc></url>
 </urlset>
 
