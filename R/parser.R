@@ -358,7 +358,7 @@ parseMultiDatSet = function(filename) {
   return(multi)
 }
 
-test = parseMASVFile('./inst/masv2test.tsv')
+#test = parseMASVFile('./inst/masv2test.tsv')
 
 
 
@@ -372,4 +372,4 @@ test = parseMASVFile('./inst/masv2test.tsv')
 #e_sets = parseExpressionSets('./inst/masv2test.tsv')
 #e_set = e_sets[[2]]
 
-multi_test = parseMultiDatSet('./inst/masv2test.tsv')
+#multi_test = parseMultiDatSet('./inst/masv2test.tsv')
