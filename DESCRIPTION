@@ -12,6 +12,6 @@ Encoding: UTF-8
 Imports:
   Biobase
 Suggests: 
-    testthat 
+    testthat, 
     stringr
 Config/testthat/edition: 3
