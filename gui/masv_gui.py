@@ -5,7 +5,7 @@ import rpy2.robjects as robjects
 
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from PyQt6.QtGui import QBrush, QColor
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QTableView, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QTableView, QWidget, QVBoxLayout, QLabel
 
 # Model to contain masv data
 class MasvTableModel(QAbstractTableModel):
@@ -50,11 +50,25 @@ class MainMasvWindow(QMainWindow):
         select_file_button.setCheckable(True)
         select_file_button.clicked.connect(self.select_file_click)
 
+        self.label = QLabel(self)
+        #label.setFrameStyle(QFrame.Shape.{f} | QFrame.Shadow.{f})
+        self.label.setText("Select file to check")
+
         # Table to display data
         self.table = QTableView()
 
+        layout = QVBoxLayout()
+
+        layout.addWidget(select_file_button)
+        layout.addWidget(self.label)
+        layout.addWidget(self.table)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
         # Set the central widget of the Window.
-        self.setCentralWidget(select_file_button)
+        #self.setCentralWidget(select_file_button)
     
     def select_file_click(self):
             masv_file_select = QFileDialog.getOpenFileName(self, self.tr("Select MASV file"), "", self.tr("Masv file (*.tsv)"))
@@ -67,14 +81,18 @@ class MainMasvWindow(QMainWindow):
             library("MultiDataSet")
             library('stringr')
             source("./R/parser.R")
-            test = parseMultiDatSet("{filepath}")
+            test = parseMultiDataSet("{filepath}")
             '''
             try:
                 res = robjects.r(rcode)
             except Exception as err:
                 err_string = str(err)
+                self.label.setText(err_string)
 
                 if '~MASV_ERROR~' in err_string:
+                    err_string = err_string.split('~MASV_ERROR~')[1]
+                    self.label.setText(err_string)
+
                     column_match = re.search('COLUMN\|\d*\|', err_string)
                     col_highlight = int(column_match.group(0).split('|')[1])-1
 
@@ -87,7 +105,7 @@ class MainMasvWindow(QMainWindow):
 
             self.model = MasvTableModel(masv_list, col_highlight = col_highlight, row_highlight = row_highlight)
             self.table.setModel(self.model)
-            self.setCentralWidget(self.table)               
+            #self.setCentralWidget(self.table)               
 
 app = QApplication(sys.argv)
 

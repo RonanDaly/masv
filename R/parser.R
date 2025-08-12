@@ -283,9 +283,9 @@ parseMASVFile = function(filename) {
             err_message = str_split_fixed(err$message, "-COL-",3)
             col = as.integer(err_message[2]) + group_start - 1
             message = err_message[3]
-            err$message = paste0(message, ' (in ROW|', line_num,'| COLUMN|',col,'| )~MASV_ERROR~')
+            err$message = paste0('~MASV_ERROR~',message, ' (in ROW|', line_num,'| COLUMN|',col,'| )')
           } else {
-          err$message = paste0(err$message, ' (in: ROW|', line_num, '| )~MASV_ERROR~')
+          err$message = paste0('~MASV_ERROR~',err$message, ' (in: ROW|', line_num, '| )')
           }
           stop(err)
         })
