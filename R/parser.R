@@ -94,7 +94,7 @@ getRType = function(masvDataType) {
 #' @returns A string
 parseCell = function(cell_data, rType, col_num) {
   return_value = tryCatch({
-    value = convert_string(cell_data, rType)
+    value = suppressWarnings(convert_string(cell_data, rType))
     if ( is.na(value) ) {
       if (cell_data != '') {
         stop('unable to convert data')
@@ -102,13 +102,12 @@ parseCell = function(cell_data, rType, col_num) {
     }
     return(value)
   }, warning = function(war) {
-    war$message = paste('-COL-', col_num, '-COL-', war$message)
-    warning(war)
+    #war$message = paste('-COL-', col_num, '-COL-', war$message)
+    #warning(war)
     value = convert_string(cell_data, rType)
     #return(convert_string(cols[i], rType))
     return(value)
   }, error = function(err) {
-    
     err$message = paste('-COL-', col_num, '-COL-', err$message)
     stop(err)
   })
@@ -282,11 +281,11 @@ parseMASVFile = function(filename) {
         }, error = function(err) {
           if ( startsWith(err$message,'-COL-')){
             err_message = str_split_fixed(err$message, "-COL-",3)
-            row = as.integer(err_message[2]) + group_start
+            col = as.integer(err_message[2]) + group_start - 1
             message = err_message[3]
-            err$message = paste(message, ' (in position: ', line_num,':',row,')')
+            err$message = paste0(message, ' (in ROW|', line_num,'| COLUMN|',col,'| )~MASV_ERROR~')
           } else {
-          err$message = paste(err$message, ' (in line: ', line_num, ')')
+          err$message = paste0(err$message, ' (in: ROW|', line_num, '| )~MASV_ERROR~')
           }
           stop(err)
         })
@@ -377,7 +376,7 @@ parseExpressionSets = function(filename) {
 #' 
 #' @param filename A string.
 #' @returns A MultiDataSet
-parseMultiDatSet = function(filename) {
+parseMultiDataSet = function(filename) {
   multi = createMultiDataSet()
   e_set_list = parseExpressionSets(filename)
   e_sets = e_set_list$e_sets
@@ -406,4 +405,4 @@ parseMultiDatSet = function(filename) {
 #e_sets = parseExpressionSets('./inst/masv2test.tsv')
 #e_set = e_sets[[2]]
 
-#multi_test = parseMultiDatSet('./inst/masv2test.tsv')
+#multi_test = parseMultiDataSet('./inst/masv_err_test.tsv')
