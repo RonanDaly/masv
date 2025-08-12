@@ -1,5 +1,7 @@
 import sys
+import re
 import pandas as pd
+import rpy2.robjects as robjects
 
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from PyQt6.QtGui import QBrush, QColor
@@ -15,7 +17,7 @@ class MasvTableModel(QAbstractTableModel):
         self.row_highlight = row_highlight
         self.colors = dict()
 
-    def data(self, index, role, col_highlight = None, row_highlight = None):
+    def data(self, index, role):
         if role == Qt.ItemDataRole.DisplayRole:
             return self._data[index.row()][index.column()]
         elif role == Qt.ItemDataRole.BackgroundRole and index.column() == self.col_highlight:
@@ -58,14 +60,34 @@ class MainMasvWindow(QMainWindow):
             masv_file_select = QFileDialog.getOpenFileName(self, self.tr("Select MASV file"), "", self.tr("Masv file (*.tsv)"))
             filepath = masv_file_select[0]
 
+            col_highlight = None
+            row_highlight = None
+
+            rcode = f'''
+            library("MultiDataSet")
+            library('stringr')
+            source("./R/parser.R")
+            test = parseMultiDatSet("{filepath}")
+            '''
+            try:
+                res = robjects.r(rcode)
+            except Exception as err:
+                err_string = str(err)
+
+                if '~MASV_ERROR~' in err_string:
+                    column_match = re.search('COLUMN\|\d*\|', err_string)
+                    col_highlight = int(column_match.group(0).split('|')[1])-1
+
+                    row_match = re.search('ROW\|\d*\|', err_string)
+                    row_highlight = int(row_match.group(0).split('|')[1])-1                    
+
             masv_df = pd.read_csv(filepath, sep='\t')
 
-            self.model = MasvTableModel(masv_df.values.tolist(), col_highlight = 2, row_highlight = 2)
-            self.table.setModel(self.model)
-            self.setCentralWidget(self.table)
-            #print(masv_df)
-                 
+            masv_list = [masv_df.columns.values.tolist()] + masv_df.values.tolist()
 
+            self.model = MasvTableModel(masv_list, col_highlight = col_highlight, row_highlight = row_highlight)
+            self.table.setModel(self.model)
+            self.setCentralWidget(self.table)               
 
 app = QApplication(sys.argv)
 
