@@ -49,7 +49,7 @@ convertNAs = function(x) {
 #'
 #' @param eset A ExpressionSet.
 #' @param filename A string.
-eSetToMASV = function(eset, filename) {
+eSetToMASV = function(eset, filename, dataset_name='MASV_dataset') {
   # Open connection
   con = file(filename, open='w')
   # Get data type
@@ -81,6 +81,10 @@ eSetToMASV = function(eset, filename) {
 
   # Get and write second row string
   secondRow = paste('', dataType, paste(rep('', length(featureNames)), collapse='\t'), paste(covariateTypes, collapse='\t'), sep='\t')
+  writeLines(secondRow, con)
+  
+  # Get and write third row string
+  thirdRow = paste('', dataset_name, paste(rep('', length(featureNames)), collapse='\t'), paste(covariateTypes, collapse='\t'), sep='\t')
   writeLines(secondRow, con)
 
   for ( i in 1:ncol(data) ) {
