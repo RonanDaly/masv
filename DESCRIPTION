@@ -9,8 +9,10 @@ Authors@R: c(
     person("Ronan", "Daly", email = "ronan@dalyr.com", role = c("aut")),
     person("Corey", "Ansley", email = "coreyansley@gmail.com", role = c("aut", "cre")))
 Encoding: UTF-8
+biocViews:
 Imports:
-  Biobase
+    Biobase,
+    MultiDataSet
 Suggests: 
     testthat, 
     stringr
